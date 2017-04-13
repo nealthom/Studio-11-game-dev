@@ -5,9 +5,11 @@ var mImage = new Image();
 var mReady = false;
 var bgReady = false;
 var marioX = 400;
+var marioY = 390;
 var tiles = [];
 var rightPressed = false;
 var leftPressed = false;
+var upPressed = false;
 var level     =[[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,],
 								[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,],
 								[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,],
@@ -18,8 +20,8 @@ var level     =[[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,],
 								[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,],
 								[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,],
 								[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,],
-								[0,0,0,0,0,0,0,0,0,0,0,0,0,2,2,2,2,0,0,0,0,0,0,0,],
 								[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,],
+								[0,0,0,0,0,0,0,0,0,0,0,0,0,2,2,2,2,0,0,0,0,0,0,0,],
 								[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,],
 								[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,],
 							  [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,],
@@ -46,7 +48,13 @@ bgImage.src = 'tiles.png';
 mImage.src = 'mario.png';
 var dxB = 0;
 var dxM = 0;
+var dyM = 0;
 var rate = 0;
+var marioSpeed = 4;
+var mFramePosX = 81;
+var mFramePosY = 34;
+var spriteSpeed = 8;
+var looking = 'right';
 var marioUpdate = () =>{
 
 if( rate % 6 == 0){
@@ -56,7 +64,28 @@ if( rate % 6 == 0){
 		dxM += 17;
 	}
 	rate++;
+}
 
+var goingUp = false;
+var jump = () =>{
+
+	if( goingUp){
+		if(dyM == -90){
+			goingUp = false;
+		}
+		else
+			dyM -= 2;
+	}
+    else if( !dyM && !goingUp){
+	
+	goingUp = true;
+}
+	else if( !goingUp && dyM){
+		if( dyM >= 0)
+				dyM +=2;
+	}
+
+	
 }
 
 var render = () =>{
@@ -69,19 +98,42 @@ var render = () =>{
 }
 var drawMario = () =>{
 	if(mReady){
-		ctx.drawImage(mImage,80+dxM,34,15,15,marioX,390, 30, 30);
+		ctx.drawImage(mImage,mFramePosX+dxM,mFramePosY,15,15,marioX,marioY + dyM, 30, 30);
+		
 		if( rightPressed){
-		     marioX += 7;
+			mFramePosX = 81;
+			mFramePosY = 34;
+		     marioX += marioSpeed;
 				 if( marioX >720)
 				 marioX = 0;
 				 marioUpdate();
-			 }
-	  else if( leftPressed)
-		     marioX -= 7;
-				 if( marioX < 0)
-				 marioX = 0;
+				 
+			 }//end of rightPressed
+	  else if( leftPressed){
+		mFramePosX = 81;
+		mFramePosY = 101;
+		
+		  marioX -= marioSpeed;			 
+			if( marioX < 0)
+			 	marioX = 720;
+		  marioUpdate();
+		   
+		}//end of LeftPressed
+	  else if( upPressed){
+		  dxM = 0;
+		  mFramePosX = 166;
+		  mFramePosY = 34;
+		  jump();
+	  }
+	 
+	
+			
+		
+		
+	  }
 	}
-}
+
+
 var drawLevel = () =>{
  if( bgReady){
 		for( var i = 0; i < rows; i++){
@@ -109,6 +161,8 @@ document.addEventListener("keyup",keyUpHandler,false);
 function keyDownHandler(event){
 	if(event.keyCode == 39)
 		rightPressed = true;
+    else if( event.keyCode == 38)
+		upPressed = true;
 	else if( event.keyCode == 37)
 		leftPressed = true;
 }
@@ -116,6 +170,8 @@ function keyDownHandler(event){
 function keyUpHandler(event){
 	if(event.keyCode == 39)
 		rightPressed = false;
+	else if( event.keyCode == 38)
+		upPressed = false;
 	else if( event.keyCode == 37)
 		leftPressed = false;
 }
