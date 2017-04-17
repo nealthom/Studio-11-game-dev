@@ -1,3 +1,5 @@
+// line 156, I have a small attempt at playing around with collision detection
+// Mario walks left and right and jumps
 var canvas = document.getElementById('myCanvas');
 var ctx = canvas.getContext('2d');
 var bgImage = new Image();
@@ -23,7 +25,7 @@ var level     =[[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,],
 								[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,],
 								[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,],
 								[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,],
-								[0,0,0,0,0,0,0,0,0,0,0,0,0,2,2,2,2,0,0,0,0,0,0,0,],
+								[0,0,0,0,0,0,0,0,0,0,0,0,2,2,2,2,2,0,0,0,0,0,0,0,],
 								[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,],
 								[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,],
 							  [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,],
@@ -83,7 +85,7 @@ var jump = () =>{
 	
 	goingUp = true;
 }
-	else if( !goingUp && dyM){
+	else if( !goingUp){ 
 		if( dyM >= 0)
 				dyM +=2;
 	}
@@ -103,52 +105,75 @@ var drawMario = () =>{
 	if(mReady){
 		ctx.drawImage(mImage,mFramePosX+dxM,mFramePosY,15,15,marioX,marioY + dyM, 30, 30);
 		
-		if( rightPressed){
+		if( rightPressed ){
+			if(!goingUp && !goingDown){
 			mFramePosX = 81;
 			mFramePosY = 34;
+			marioUpdate();
+			}
 		     marioX += marioSpeed;
 				 if( marioX >720)
 				 marioX = 0;
-				 marioUpdate();
+				 looking = 'right';
 				 
 			 }//end of rightPressed
-	  else if( leftPressed){
+	  else if( leftPressed ){
+		if(!goingUp && !goingDown){
 		mFramePosX = 81;
 		mFramePosY = 101;
-		
+		marioUpdate();
+	}
+		else{
+			mFramePosX = 166;
+		    mFramePosY = 101;
+		}
 		  marioX -= marioSpeed;			 
 			if( marioX < 0)
 			 	marioX = 720;
-		  marioUpdate();
-		   
+		  
+		   looking = 'left';
 		}//end of LeftPressed
-	  else if( upPressed && !goingUp){
+		if( !goingDown){
+	  if(  upPressed){
 		  dxM = 0;
+		  if(looking === 'right'){
 		  mFramePosX = 166;
 		  mFramePosY = 34;
+		}
+		else
+		{
+			mFramePosX = 166;
+		    mFramePosY = 101;
+		}
 		  goingUp = true;
 		 // jump();
 	  }
+		}
 	 
 	if( goingUp){
-		if( dyM <= -90){
+		   var nx = Math.floor((marioY + dyM) / 30);
+		   var ny = Math.floor( marioX / 30);
+			console.log(nx + ' : ' + ny);
+		if( dyM <= -90 || level[ nx][ny]){// the part after || is me experimenting with collision detection*******************************
 			goingUp = false;
 			goingDown = true;
 		}
 		else
 			{
 				
-				dyM -= 6;
+				dyM -= 4;
 			}
 	}
 	if( goingDown){
-		if( dyM >= 0){
+		var nx = Math.floor((marioY + dyM) / 30);
+		   var ny = Math.floor( marioX / 30);
+		if( dyM >= 0 ){
 			goingUp = false;
 			goingDown = false;
 		}
 		else
 			{
-				dyM += 6;
+				dyM += 4;
 			}
 	}
 			
