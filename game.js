@@ -10,6 +10,8 @@ var tiles = [];
 var rightPressed = false;
 var leftPressed = false;
 var upPressed = false;
+var goingUp = false;
+var goingDown = false;
 var level     =[[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,],
 								[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,],
 								[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,],
@@ -55,8 +57,9 @@ var mFramePosX = 81;
 var mFramePosY = 34;
 var spriteSpeed = 8;
 var looking = 'right';
-var marioUpdate = () =>{
 
+var marioUpdate = () =>{
+// this alters the rate the sprite changes
 if( rate % 6 == 0){
 	if( dxM >=17 * 3)
 		dxM = 17;
@@ -66,7 +69,7 @@ if( rate % 6 == 0){
 	rate++;
 }
 
-var goingUp = false;
+
 var jump = () =>{
 
 	if( goingUp){
@@ -119,14 +122,35 @@ var drawMario = () =>{
 		  marioUpdate();
 		   
 		}//end of LeftPressed
-	  else if( upPressed){
+	  else if( upPressed && !goingUp){
 		  dxM = 0;
 		  mFramePosX = 166;
 		  mFramePosY = 34;
-		  jump();
+		  goingUp = true;
+		 // jump();
 	  }
 	 
-	
+	if( goingUp){
+		if( dyM <= -90){
+			goingUp = false;
+			goingDown = true;
+		}
+		else
+			{
+				
+				dyM -= 6;
+			}
+	}
+	if( goingDown){
+		if( dyM >= 0){
+			goingUp = false;
+			goingDown = false;
+		}
+		else
+			{
+				dyM += 6;
+			}
+	}
 			
 		
 		
