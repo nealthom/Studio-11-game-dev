@@ -8,18 +8,19 @@ var mReady = false;
 var bgReady = false;
 var marioX = 400;
 var marioY = 390;
+var platformY = 0;
 var tiles = [];
 var rightPressed = false;
 var leftPressed = false;
 var upPressed = false;
 var goingUp = false;
 var goingDown = false;
-var level     =[[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,],
+var level     =				   [[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,],
 								[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,],
 								[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,],
-							  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,],
+							    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,],
 								[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,],
-							  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,],
+							    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,],
 								[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,],
 								[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,],
 								[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,],
@@ -28,8 +29,8 @@ var level     =[[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,],
 								[0,0,0,0,0,0,0,0,0,0,0,0,2,2,2,2,2,0,0,0,0,0,0,0,],
 								[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,],
 								[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,],
-							  [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,],
-							  [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,]];
+							    [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,],
+							    [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,]];
 
 var rows = 16;
 var cols = 24;
@@ -71,35 +72,13 @@ if( rate % 6 == 0){
 	rate++;
 }
 
-
-var jump = () =>{
-
-	if( goingUp){
-		if(dyM == -90){
-			goingUp = false;
-		}
-		else
-			dyM -= 2;
-	}
-    else if( !dyM && !goingUp){
-	
-	goingUp = true;
-}
-	else if( !goingUp){ 
-		if( dyM >= 0)
-				dyM +=2;
-	}
-
-	
-}
-
 var render = () =>{
 /*	if(bgReady){
 		ctx.drawImage(bgImage,0 + dxB ,0,400,225,0,0,800,460);
 	}*/
 	ctx.clearRect(0,0,canvas.width, canvas.height);
 	drawLevel();
-  drawMario();
+  	drawMario();
 }
 var drawMario = () =>{
 	if(mReady){
@@ -122,7 +101,7 @@ var drawMario = () =>{
 		mFramePosX = 81;
 		mFramePosY = 101;
 		marioUpdate();
-	}
+		}
 		else{
 			mFramePosX = 166;
 		    mFramePosY = 101;
@@ -134,7 +113,7 @@ var drawMario = () =>{
 		   looking = 'left';
 		}//end of LeftPressed
 		if( !goingDown){
-	  if(  upPressed){
+	    if(  upPressed){
 		  dxM = 0;
 		  if(looking === 'right'){
 		  mFramePosX = 166;
@@ -154,7 +133,7 @@ var drawMario = () =>{
 		   var nx = Math.floor((marioY + dyM) / 30);
 		   var ny = Math.floor( marioX / 30);
 			console.log(nx + ' : ' + ny);
-		if( dyM <= -90 || level[ nx][ny]){// the part after || is me experimenting with collision detection*******************************
+		if( dyM <= platformY - 90 || level[ nx][ny]){// the part after || is me experimenting with collision detection*******************************
 			goingUp = false;
 			goingDown = true;
 		}
@@ -163,24 +142,38 @@ var drawMario = () =>{
 				
 				dyM -= 4;
 			}
-	}
+	}//end of if goingUp 
 	if( goingDown){
 		var nx = Math.floor((marioY + dyM) / 30);
 		   var ny = Math.floor( marioX / 30);
-		if( dyM >= 0 ){
+		if( dyM >= 0 || level[nx +1][ny +1]){
 			goingUp = false;
 			goingDown = false;
+			platformY = dyM;
 		}
 		else
 			{
 				dyM += 4;
 			}
-	}
-			
+	}//end of if goingDown
+	
 		
+		if( !goingDown && !goingUp && !upPressed && !leftPressed && !rightPressed){
+			if(looking ==='right'){
+				mFramePosX = 81;
+		   	    mFramePosY = 34;
+				dxM = 0;
+			}
+			else{
+				mFramePosX = 81;
+		    	mFramePosY = 101;
+				dxM = 0;
+			}
+
+		}
 		
-	  }
-	}
+	  }//end of mReady
+	}//end of drawMario
 
 
 var drawLevel = () =>{
